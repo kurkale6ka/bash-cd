@@ -86,3 +86,7 @@ cds() {
    else         column -t < "$HOME"/.cdmarks
    fi
 }
+
+cdc() {
+   sed "s@\~@$HOME@" "$HOME"/.cdmarks.skel > "$HOME"/.cdmarks
+}
