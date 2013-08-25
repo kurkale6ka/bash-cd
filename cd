@@ -29,9 +29,9 @@ cd() {
          ed -s "$HOME"/.cdmarks <<< $'H\n101,$d\nwq\n'
       fi
       while read -r nb dir mark; do
-         if [[ $mark == *$directory* || $dir == *$directory* ]]; then
+         if [[ $dir == *$directory* || $mark == *$directory* ]]; then
             # cd options dir
-            if builtin cd "${@:1:((${#@}-1))}" "${dir/\~/$HOME}" 2>/tmp/cderror
+            if builtin cd "${@:1:((${#@}-1))}" "$dir" 2>/tmp/cderror
             then
                success=1
                # We need the directory corresponding to the bookmark in order to
@@ -70,7 +70,7 @@ cd() {
       # The directory is a new entry
       else
          # a 1 $directory .
-         printf -v new_dir 'H\na\n1 %s\n.\nwq\n' "${directory/$HOME/~}"
+         printf -v new_dir 'H\na\n1 %s\n.\nwq\n' "$directory"
          ed -s "$HOME"/.cdmarks <<< "$new_dir"
       fi
    fi
