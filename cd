@@ -80,4 +80,10 @@ cd() {
    fi
 }
 
-cds() { cat "$HOME"/.{cdmarks,cdmarks_after} 2>/dev/null | column -t; }
+cds() {
+   if (($#)); then
+      cat "$HOME"/.{cdmarks,cdmarks_after} 2>/dev/null | command grep "$1" | column -t
+   else
+      cat "$HOME"/.{cdmarks,cdmarks_after} 2>/dev/null | column -t
+   fi
+}
