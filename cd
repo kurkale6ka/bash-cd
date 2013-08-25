@@ -3,7 +3,7 @@
 shopt -u nocasematch
 
 # $HOME is never registered
-# Never use ~ when entering bookmarks in .cdmarks,
+# Never use ~ when entering bookmarks in .cdmarks_after,
 #       neither terminate paths with a /
 # TODO: cd keyword1 keyword2 (for refined search)
 #       Completion
@@ -25,8 +25,8 @@ cd() {
    # Exclude cd wrong options
    elif [[ $directory != '-'* ]]; then
       # Shrink file size to 100 lines
-      if (( $(wc -l $HOME/.cdmarks | cut -d' ' -f1) > 100 )); then
-         ed -s "$HOME"/.cdmarks <<< $'H\n101,$d\nwq\n'
+      if (( $(wc -l $HOME/.cdmarks_after | cut -d' ' -f1) > 100 )); then
+         ed -s "$HOME"/.cdmarks_after <<< $'H\n101,$d\nwq\n'
       fi
       while read -r nb dir mark; do
          if [[ $mark == *$directory* || $dir == *$directory* ]]; then
@@ -34,7 +34,7 @@ cd() {
             if builtin cd "${@:1:((${#@}-1))}" "$dir" 2>/tmp/cderror; then
                success=1
                # We need the directory corresponding to the bookmark in order to
-               # update ~/.cdmarks
+               # update ~/.cdmarks_after
                directory="$dir"
                break
             fi
@@ -44,8 +44,8 @@ cd() {
    # Exclude HOME directory
    if ((success)) && [[ $directory != $HOME && $directory != $current ]]; then
       # Shrink file size to 100 lines
-      if (( $(wc -l $HOME/.cdmarks | cut -d' ' -f1) > 100 )); then
-         ed -s "$HOME"/.cdmarks <<< $'H\n101,$d\nwq\n'
+      if (( $(wc -l $HOME/.cdmarks_after | cut -d' ' -f1) > 100 )); then
+         ed -s "$HOME"/.cdmarks_after <<< $'H\n101,$d\nwq\n'
       fi
       local found=0
       local line=0
@@ -57,19 +57,19 @@ cd() {
             local new_entry="$((++new_nb)) $dir $mark"
             break
          fi
-      done < "$HOME"/.cdmarks
+      done < "$HOME"/.cdmarks_after
       # Increase weight of the directory
       if ((found)); then
          # Path must not contain any @s !
          # $line s @ .* @ $new_entry @
          printf -v new_dir_weight 'H\n%us@.*@%s@\nwq\n' "$line" "$new_entry"
-         ed -s "$HOME"/.cdmarks <<< "$new_dir_weight"
-         sort -rn -o "$HOME"/.cdmarks "$HOME"/.cdmarks
+         ed -s "$HOME"/.cdmarks_after <<< "$new_dir_weight"
+         sort -rn -o "$HOME"/.cdmarks_after "$HOME"/.cdmarks_after
       # The directory is a new entry
       else
          # a 1 $directory .
          printf -v new_dir 'H\na\n1 %s\n.\nwq\n' "$directory"
-         ed -s "$HOME"/.cdmarks <<< "$new_dir"
+         ed -s "$HOME"/.cdmarks_after <<< "$new_dir"
       fi
    fi
    if ((success)); then
