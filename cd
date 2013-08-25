@@ -68,7 +68,7 @@ cd() {
       # The directory is a new entry
       else
          # a 1 $directory .
-         printf -v new_dir 'H\na\n1 %s\n.\nwq\n' "${directory/\~/$HOME}"
+         printf -v new_dir 'H\na\n1 %s\n.\nwq\n' "${directory/$HOME/~}"
          ed -s "$HOME"/.cdmarks_after <<< "$new_dir"
       fi
    fi
