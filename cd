@@ -1,5 +1,6 @@
 #! /usr/bin/env bash
 
+# Source in order not to change this globally
 shopt -u nocasematch
 
 # $HOME is never registered
@@ -8,7 +9,6 @@ shopt -u nocasematch
 # TODO: cd keyword1 keyword2 (for refined search)
 #       Completion
 cd() {
-   # Source in order not to change this globally
    local current="$PWD"
    local directory="${@:(-1)}"
    [[ $current == $directory ]] && return 0
@@ -16,7 +16,7 @@ cd() {
    # cd, cd options only, cd /boot/grub/, cd bookmark
    if builtin cd "$@" 2>/tmp/cderror; then
       # For cd - and directory typo (ex: /var/loc Vs log) cases
-      # Also cd /etc/X11/ will not create a different entry than /etc/X11
+      # Also cd /etc/X11/ will not create a different entry than cd /etc/X11
       directory="$PWD"
       success=1
    # cd wrong options
@@ -31,7 +31,8 @@ cd() {
       while read -r nb dir mark; do
          if [[ $mark == *$directory* || $dir == *$directory* ]]; then
             # cd options dir
-            if builtin cd "${@:1:((${#@}-1))}" "${dir/\~/$HOME}" 2>/tmp/cderror; then
+            if builtin cd "${@:1:((${#@}-1))}" "${dir/\~/$HOME}" 2>/tmp/cderror
+            then
                success=1
                # We need the directory corresponding to the bookmark in order to
                # update ~/.cdmarks
@@ -39,9 +40,10 @@ cd() {
                break
             fi
          fi
-      done < "$HOME"/.cdmarks 2>/tmp/cderror
+      done < "$HOME"/.cdmarks
    fi
-   # Exclude HOME directory
+   # Update .cdmarks (weights or new entry)
+   # Exclude HOME or current directory
    if ((success)) && [[ $directory != $HOME && $directory != $current ]]; then
       # Shrink file size to 100 lines
       if (( $(wc -l $HOME/.cdmarks | cut -d' ' -f1) > 150 )); then
@@ -72,18 +74,15 @@ cd() {
          ed -s "$HOME"/.cdmarks <<< "$new_dir"
       fi
    fi
-   if ((success)); then
-      return 0
-   else
-      cat /tmp/cderror >&2
-      return 1
+   if ((success))
+   then                       return 0
+   else cat /tmp/cderror >&2; return 1
    fi
 }
 
 cds() {
-   if (($#)); then
-      command grep "$1" "$HOME"/.cdmarks 2>/dev/null | column -t
-   else
-      column -t < "$HOME"/.cdmarks 2>/dev/null
+   if (($#))
+   then command   grep "$1" "$HOME"/.cdmarks | column -t
+   else         column -t < "$HOME"/.cdmarks
    fi
 }
