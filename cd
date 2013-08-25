@@ -82,8 +82,8 @@ cd() {
 
 cds() {
    if (($#)); then
-      cat "$HOME"/.cdmarks 2>/dev/null | command grep "$1" | column -t
+      command grep "$1" "$HOME"/.cdmarks 2>/dev/null | column -t
    else
-      cat "$HOME"/.cdmarks 2>/dev/null | column -t
+      column -t < "$HOME"/.cdmarks 2>/dev/null
    fi
 }
