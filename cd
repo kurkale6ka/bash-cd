@@ -90,3 +90,8 @@ cds() {
 cdc() {
    sed "s@\~@$HOME@" "$HOME"/.cdmarks.skel > "$HOME"/.cdmarks
 }
+
+cdb() {
+   printf -v bookmark 'H\n/%s/s@\s*$@ %s@\nwq\n' "${PWD//\//\/}" "$1"
+   ed -s "$HOME"/.cdmarks <<< "$bookmark"
+}
