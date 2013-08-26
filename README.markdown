@@ -12,7 +12,7 @@ Once you've been to the above location you can return by simply typing:
 
 `cd li` (or any string part of the directory)
 
-As an additional bonus you could have a named bookmark for that location by
+As an additional bonus you have the possibility to create a named bookmark by
 typing `cdb bookmark` while in the right location
 
 Example:
@@ -32,3 +32,6 @@ Setup
 * `$ exec bash`
 
 You are ready!
+
+_Note_: `cds filter` will list your bookmarks and `cdc` can help you with
+migrating a personal `.cdmarks.skel` file
