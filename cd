@@ -1,17 +1,18 @@
 #! /usr/bin/env bash
 
-# Source in order not to change this globally
-shopt -u nocasematch
-
 # $HOME is never registered
 # Never use ~ when entering bookmarks in .cdmarks,
 #       neither terminate paths with a /
 # TODO: cd keyword1 keyword2 (for refined search)
 #       Completion
 cd() {
+   oldShoptOptions="$(shopt -p)"
+   shopt -u nocasematch
+
    local current="$PWD"
    local directory="${@:(-1)}"
    [[ $current == $directory ]] && return 0
+
    local success=0
    # cd, cd options only, cd /boot/grub/, cd bookmark
    if builtin cd "$@" 2>/tmp/cderror; then
@@ -42,6 +43,7 @@ cd() {
          fi
       done < "$HOME"/.cdmarks
    fi
+
    # Update .cdmarks (weights or new entry)
    # Exclude HOME or current directory
    if ((success)) && [[ $directory != $HOME && $directory != $current ]]; then
@@ -74,6 +76,9 @@ cd() {
          ed -s "$HOME"/.cdmarks <<< "$new_dir"
       fi
    fi
+
+   eval "$oldShoptOptions" 2>/dev/null
+
    if ((success))
    then                       return 0
    else cat /tmp/cderror >&2; return 1
