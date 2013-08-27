@@ -6,12 +6,12 @@
 # TODO: cd keyword1 keyword2 (for refined search)
 #       Completion
 cd() {
-   oldShoptOptions="$(shopt -p)"
-   shopt -u nocasematch
-
    local current="$PWD"
    local directory="${@:(-1)}"
-   [[ $current == $directory ]] && return 0
+   [[ $current == $directory || $current == ${directory%/} ]] && return 0
+
+   oldShoptOptions="$(shopt -p)"
+   shopt -u nocasematch
 
    local success=0
    # cd, cd options only, cd /boot/grub/, cd bookmark
@@ -42,8 +42,8 @@ cd() {
          if ((found)); then
             # Path must not contain any @s !
             # $line s @ .* @ $new_entry @
-            printf -v new_dir_weight 'H\n%us@.*@%s@\nwq\n' "$line" "$new_entry"
-            ed -s "$HOME"/.cdmarks <<< "$new_dir_weight"
+            printf -v new_weight 'H\n%us@.*@%s@\nwq\n' "$line" "$new_entry"
+            ed -s "$HOME"/.cdmarks <<< "$new_weight"
             sort -rn -o "$HOME"/.cdmarks "$HOME"/.cdmarks
          # The directory is a new entry
          else
@@ -58,28 +58,28 @@ cd() {
    # Exclude cd wrong options
    elif [[ $directory != '-'* ]]; then
       # Shrink file size to 100 lines
-      if [[ $directory != $HOME && $directory != $current ]]; then
-         if (( $(wc -l $HOME/.cdmarks | cut -d' ' -f1) > 150 )); then
-            ed -s "$HOME"/.cdmarks <<< $'H\n101,$d\nwq\n'
-         fi
-         local line=0
-         while read -r nb dir mark; do
-            ((line++))
-            if [[ $dir == *$directory* || $mark == *$directory* ]]; then
-               # cd options dir
-               if builtin cd "${@:1:((${#@}-1))}" "$dir" 2>/tmp/cderror
-               then
-                  success=1
+      if (( $(wc -l $HOME/.cdmarks | cut -d' ' -f1) > 150 )); then
+         ed -s "$HOME"/.cdmarks <<< $'H\n101,$d\nwq\n'
+      fi
+      local line=0
+      while read -r nb dir mark; do
+         ((line++))
+         if [[ $dir == *$directory* || $mark == *$directory* ]]; then
+            # cd options dir
+            if builtin cd "${@:1:((${#@}-1))}" "$dir" 2>/tmp/cderror
+            then
+               success=1
+               if [[ $dir != $HOME && $dir != $current ]]; then
                   local new_nb="$nb"
                   local new_entry="$((++new_nb)) $dir $mark"
-                  printf -v new_dir_weight 'H\n%us@.*@%s@\nwq\n' "$line" "$new_entry"
-                  ed -s "$HOME"/.cdmarks <<< "$new_dir_weight"
+                  printf -v new_weight 'H\n%us@.*@%s@\nwq\n' "$line" "$new_entry"
+                  ed -s "$HOME"/.cdmarks <<< "$new_weight"
                   sort -rn -o "$HOME"/.cdmarks "$HOME"/.cdmarks
-                  break
                fi
+               break
             fi
-         done < "$HOME"/.cdmarks
-      fi
+         fi
+      done < "$HOME"/.cdmarks
    fi
 
    eval "$oldShoptOptions" 2>/dev/null
@@ -102,6 +102,6 @@ cdc() {
 }
 
 cdb() {
-   printf -v bookmark 'H\n/%s/s@\s*$@ %s@\nwq\n' "${PWD//\//\/}" "$1"
+   printf -v bookmark 'H\n/%s[^/]*$/s@\s*$@ %s@\nwq\n' "${PWD//\//\/}" "$1"
    ed -s "$HOME"/.cdmarks <<< "$bookmark"
 }
