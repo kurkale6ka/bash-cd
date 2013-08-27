@@ -60,7 +60,7 @@ cd() {
       local line=0
       while read -r nb dir mark; do
          ((line++))
-         if [[ $dir == *$directory* || $mark == *$directory* ]]; then
+         if [[ "$dir $mark" == *$directory* ]]; then
             # cd options dir
             if builtin cd "${@:1:((${#@}-1))}" "$dir" 2>/tmp/cderror; then
                if [[ $dir != $HOME && $dir != $current ]]; then
