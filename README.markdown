@@ -14,9 +14,7 @@ Once you've been to the above location you can return by simply typing:
 
 Filtering further is also possible:
 
-`cd sr li`
-
-which will ensure you don't end up in `/usr/share/lib` if it has a higher score!
+`cd sr li` will ensure you don't end up in `/usr/share/lib` if it has a higher score!
 
 As an additional bonus you have the possibility to create a named bookmark by
 typing `cdb bookmark` while in the desired location
