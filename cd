@@ -27,10 +27,7 @@ cd() {
 
       # Exclude HOME or current directory
       if [[ $PWD != $HOME && $PWD != $current ]]; then
-         # Shrink file size to 100 lines
-         if (( $(wc -l $HOME/.cdmarks | cut -d' ' -f1) > 150 ))
-         then ed -s "$HOME"/.cdmarks <<< $'H\n101,$d\nwq\n'
-         fi
+         truncate_marks
          local line=0
          while read -r nb dir mark; do
             ((line++))
@@ -59,9 +56,7 @@ cd() {
    # cd                 bookmark
    # Exclude cd wrong options
    elif ((${#bookmarks[@]} > 0)); then
-      if (( $(wc -l $HOME/.cdmarks | cut -d' ' -f1) > 150 ))
-      then ed -s "$HOME"/.cdmarks <<< $'H\n101,$d\nwq\n'
-      fi
+      truncate_marks
       local line=0
       while read -r nb dir mark; do
          ((line++))
@@ -110,4 +105,11 @@ cdc() {
 cdb() {
    printf -v bookmark 'H\n/%s[^/]*$/s@\s*$@ %s@\nwq\n' "${PWD//\//\/}" "$1"
    ed -s "$HOME"/.cdmarks <<< "$bookmark"
+}
+
+# Shrink file size to 100 lines
+truncate_marks() {
+   if (( $(wc -l $HOME/.cdmarks | cut -d' ' -f1) > 150 ))
+   then ed -s "$HOME"/.cdmarks <<< $'H\n101,$d\nwq\n'
+   fi
 }
