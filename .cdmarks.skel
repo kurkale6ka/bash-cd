@@ -5,11 +5,11 @@
 1 ~/help hf
 1 ~/bashfiles/scripts/cd
 1 ~/bashfiles bf
-1 ~/Pictures pictures img
-1 ~/Music music audio
-1 ~/Movies movies films videos
-1 ~/Downloads downloads
-1 ~/Documents documents
+1 ~/Pictures img
+1 ~/Music audio
+1 ~/Movies films videos
+1 ~/Downloads
+1 ~/Documents
 1 /var/log
 1 /usr/src/linux
 1 /media/0007-6BCA usb

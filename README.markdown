@@ -37,5 +37,10 @@ Setup
 
 You are ready!
 
-_Note_: `cds filter` will list your bookmarks and `cdc` can help you with
+_Note 1_: `cds filter` will list your bookmarks and `cdc` can help you with
 migrating a personal `~/.cdmarks.skel` file
+
+_Note 2_: Never use ~ in `~/.cdmarks.skel` or if manually entering bookmarks in
+`~/.cdmarks` (use the value of **HOME** instead). Don't terminate paths with a `/`.
+
+_Note 3_: Get help with `cdh`
