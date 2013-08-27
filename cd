@@ -4,14 +4,14 @@
 #       neither terminate paths with a /
 # TODO: Completion
 cd() {
-   local current="$PWD"
    bookmarks=()
-   for b in "$@"; do
-      [[ $b != '-'* ]] && bookmarks+=("$b")
+   for b in "$@"
+   do [[ $b != '-'* ]] && bookmarks+=("$b")
    done
-   if ((${#bookmarks[@]} == 1)); then
-      local directory="${bookmarks[0]}"
-      [[ $current == ${directory%/} ]] && return 0
+
+   local current="$PWD"
+   if ((${#bookmarks[@]} == 1))
+   then [[ $current == ${bookmarks[0]%/} ]] && return 0
    fi
 
    oldShoptOptions="$(shopt -p)"
@@ -19,19 +19,22 @@ cd() {
 
    # cd, cd options only, cd /boot/grub/
    if ((${#bookmarks[@]} <= 1)) && builtin cd "$@" 2>/tmp/cderror; then
-      # For cd - and directory typo (ex: /var/loc Vs log) cases
-      # Also cd /etc/X11/ will not create a different entry than cd /etc/X11
-      directory="$PWD"
+      # I will use PWD instead of bookmarks[0]
+      # This will ensure the following cases are dealt with correctly:
+      # cd -
+      # directory typo (cdspell: /var/loc -> log)
+      # cd /etc/X11/ creating a different entry than cd /etc/X11
+
       # Exclude HOME or current directory
-      if [[ $directory != $HOME && $directory != $current ]]; then
+      if [[ $PWD != $HOME && $PWD != $current ]]; then
          # Shrink file size to 100 lines
-         if (( $(wc -l $HOME/.cdmarks | cut -d' ' -f1) > 150 )); then
-            ed -s "$HOME"/.cdmarks <<< $'H\n101,$d\nwq\n'
+         if (( $(wc -l $HOME/.cdmarks | cut -d' ' -f1) > 150 ))
+         then ed -s "$HOME"/.cdmarks <<< $'H\n101,$d\nwq\n'
          fi
          local line=0
          while read -r nb dir mark; do
             ((line++))
-            if [[ $dir == $directory ]]; then
+            if [[ $dir == $PWD ]]; then
                local new_nb="$nb"
                local new_entry="$((++new_nb)) $dir $mark"
                # Increase weight of the directory
@@ -46,7 +49,7 @@ cd() {
          done < "$HOME"/.cdmarks
          # The directory is a new entry
          # a 1 $directory .
-         printf -v new_dir 'H\na\n1 %s\n.\nwq\n' "$directory"
+         printf -v new_dir 'H\na\n1 %s\n.\nwq\n' "$PWD"
          ed -s "$HOME"/.cdmarks <<< "$new_dir"
          eval "$oldShoptOptions" 2>/dev/null
          return 0
@@ -56,16 +59,15 @@ cd() {
    # cd                 bookmark
    # Exclude cd wrong options
    elif ((${#bookmarks[@]} > 0)); then
-      # Shrink file size to 100 lines
-      if (( $(wc -l $HOME/.cdmarks | cut -d' ' -f1) > 150 )); then
-         ed -s "$HOME"/.cdmarks <<< $'H\n101,$d\nwq\n'
+      if (( $(wc -l $HOME/.cdmarks | cut -d' ' -f1) > 150 ))
+      then ed -s "$HOME"/.cdmarks <<< $'H\n101,$d\nwq\n'
       fi
       local line=0
       while read -r nb dir mark; do
          ((line++))
          local match=1
-         for m in "${bookmarks[@]}"; do
-            [[ "$dir $mark" != *$m* ]] && match=0
+         for m in "${bookmarks[@]}"
+         do [[ "$dir $mark" != *$m* ]] && match=0
          done
          if ((match)); then
             # cd options dir
@@ -82,8 +84,8 @@ cd() {
             fi
          fi
       done < "$HOME"/.cdmarks
-      if ((${#bookmarks[@]} > 1)); then
-         echo 'No match found.' >&2; return 1
+      if ((${#bookmarks[@]} > 1))
+      then echo 'No match found.' >&2; return 1
       fi
    fi
    cat /tmp/cderror >&2; return 2

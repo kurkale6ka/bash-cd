@@ -12,8 +12,14 @@ Once you've been to the above location you can return by simply typing:
 
 `cd li` (or any string part of the directory)
 
+Filtering further is also possible:
+
+`cd sr li`
+
+which will ensure you don't end up in `/usr/share/lib` if it has a higher score!
+
 As an additional bonus you have the possibility to create a named bookmark by
-typing `cdb bookmark` while in the right location
+typing `cdb bookmark` while in the desired location
 
 Example:
 ```
@@ -34,4 +40,4 @@ Setup
 You are ready!
 
 _Note_: `cds filter` will list your bookmarks and `cdc` can help you with
-migrating a personal `.cdmarks.skel` file
+migrating a personal `~/.cdmarks.skel` file
