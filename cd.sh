@@ -123,16 +123,20 @@ HELP
 }
 
 # <tab> completion for c
-complete -o default -Fcd_complete c
+complete -Fcd_complete c
 cd_complete() {
    # Similar to cs()
    local out=$(command grep -i "${COMP_WORDS[1]}" "$HOME"/.cdmarks)
    for f in "${COMP_WORDS[@]:2}"
    do out=$(command grep -i "$f" <<< "$out")
    done
+   # Default directories
+   IFS=$'\n' read -r -d $'\0' -a defdirs < <(compgen -d "${COMP_WORDS[1]}")
+   # Our bookmarked directories
    IFS=$'\n' read -r -d $'\0' -a dirlist < <(cut -d' ' -f2 <<< "$out")
-   if [[ $dirlist ]]
-   then IFS=$'\n' read -r -d $'\0' -a COMPREPLY < <(printf '%q\n' "${dirlist[@]}")
+   local dirs=("${defdirs[@]}" "${dirlist[@]}")
+   if [[ $dirs ]]
+   then IFS=$'\n' read -r -d $'\0' -a COMPREPLY < <(printf '%q\n' "${dirs[@]}")
    fi
 }
 
