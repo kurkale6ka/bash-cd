@@ -31,9 +31,7 @@ cd_bookmarks() {
          while read -r weight dir mark; do
             ((line++))
             if [[ $dir == $PWD ]]; then
-               local new_weight="$weight"
-               local new_entry="$((++new_weight)) $dir $mark"
-               update_weight "$line" "$new_entry"
+               update_weight "$line" "$((++weight)) $dir $mark"
                return 0
             fi
          done < "$HOME"/.cdmarks
@@ -61,10 +59,8 @@ cd_bookmarks() {
          if ((match)); then
             # cd options dir
             if cd "${@:1:((${#@}-${#bookmarks[@]}))}" "$dir" 2>/tmp/cderror; then
-               if [[ $dir != $HOME && $dir != $current ]]; then
-                  local new_weight="$weight"
-                  local new_entry="$((++new_weight)) $dir $mark"
-                  update_weight "$line" "$new_entry"
+               if [[ $dir != $current ]]
+               then update_weight "$line" "$((++weight)) $dir $mark"
                fi
                return 0
             fi
