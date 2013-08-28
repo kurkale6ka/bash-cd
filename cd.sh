@@ -107,6 +107,7 @@ update_weight() {
 # Add the current directory as a new entry
 new_entry() {
    if (($#)); then
+      # TODO: add several named bookmarks at once
       # ed: a '1 directory mark' .
       printf -v new_dir 'H\na\n1 %s %s\n.\nwq\n' "$PWD" "$1"
       ed -s "$HOME"/.cdmarks <<< "$new_dir"
@@ -119,13 +120,14 @@ new_entry() {
 # cd help
 ch() {
 cat << 'HELP'
-c  filter<tab> : list a subset of bookmarks matching your filters
-cs filter ...  :                        ""
-cs             : list all bookmarks
----------------+--------------------------------------------------
-cb bookmark    : create a named bookmark for the current directory
----------------+--------------------------------------------------
-ci             : import your personal ~/.cdmarks.skel file
+c  filter<tab>  : Complete: bookmarks + default directories
+cx filter<tab>  : Complete: bookmarks
+----------------+----------------------------------------------------
+cs [filter ...] : list filtered/all bookmarks
+----------------+----------------------------------------------------
+cb [bookmark]   : create a (named) bookmark for the current directory
+----------------+----------------------------------------------------
+ci              : import your personal ~/.cdmarks.skel file
 HELP
 }
 
@@ -138,10 +140,10 @@ _cd_complete() {
    done
    # Default directories
    if [[ ${FUNCNAME[1]} == 'cd_bcomplete' ]]
-   then defdirs=()
+   then local defdirs=()
    else IFS=$'\n' read -r -d $'\0' -a defdirs < <(compgen -d "${COMP_WORDS[1]}")
    fi
-   # Our bookmarked directories
+   # Our bookmarked directories (color?)
    IFS=$'\n' read -r -d $'\0' -a dirlist < <(cut -d' ' -f2 <<< "$out")
    local dirs=("${defdirs[@]}" "${dirlist[@]}")
    if [[ $dirs ]]
@@ -168,9 +170,9 @@ cs() {
 
 # cd bookmark
 # TODO: update weights if using this function after a builtin cd (check with fc)
-#       Add several named bookmarks at once
 cb() {
    if (($#)); then
+      # TODO: Add several named bookmarks at once
       printf -v bookmark 'H\n/%s[^/]*$/s@\s*$@ %s@\nwq\n' "${PWD//\//\/}" "$1"
       if ! ed -s "$HOME"/.cdmarks <<< "$bookmark" 2>/dev/null
       then new_entry "$1"
