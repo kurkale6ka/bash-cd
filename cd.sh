@@ -28,10 +28,10 @@ cd_bookmarks() {
 
          # Increase weight for current directory since I've already been here
          local line=0
-         while read -r weight dir mark; do
+         while read -r weight dir marks; do
             ((line++))
             if [[ $dir == $PWD ]]; then
-               update_weight "$line" "$((++weight)) $dir $mark"
+               update_weight "$line" "$((++weight)) $dir $marks"
                return 0
             fi
          done < "$HOME"/.cdmarks
@@ -49,18 +49,18 @@ cd_bookmarks() {
 
       # Increase weight for current directory since I've already been here
       local line=0
-      while read -r weight dir mark; do
+      while read -r weight dir marks; do
          ((line++))
          # Check that bookmark x AND bookmark y AND ... match in this line
          local match=1
          for m in "${bookmarks[@]}"
-         do [[ "$dir $mark" != *$m* ]] && match=0
+         do [[ "$dir $marks" != *$m* ]] && match=0
          done
          if ((match)); then
             # cd options dir
             if cd "${@:1:((${#@}-${#bookmarks[@]}))}" "$dir" 2>/tmp/cderror; then
                if [[ $dir != $current ]]
-               then update_weight "$line" "$((++weight)) $dir $mark"
+               then update_weight "$line" "$((++weight)) $dir $marks"
                fi
                return 0
             fi
@@ -180,10 +180,10 @@ cb() {
    else
       # See TODO
       # local line=0
-      # while read -r weight dir mark; do
+      # while read -r weight dir marks; do
       #    ((line++))
       #    if [[ $dir == $PWD ]]; then
-      #       update_weight "$line" "$((++weight)) $dir $mark"
+      #       update_weight "$line" "$((++weight)) $dir $marks"
       #       return 0
       #    fi
       # done < "$HOME"/.cdmarks
