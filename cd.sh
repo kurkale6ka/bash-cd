@@ -1,7 +1,6 @@
 #! /usr/bin/env bash
 
-# TODO: Completion
-cd() {
+cd_bookmarks() {
    local current="$PWD"
 
    # Get bookmarks/directory from: cd options bookmark 1...n {{{1
@@ -107,38 +106,58 @@ update_weight() {
    sort -rn -o "$HOME"/.cdmarks "$HOME"/.cdmarks
 }
 
-cdh() {
-cat << 'EOM'
-cds            : list all bookmarks
-cds filter ... : list a subset of bookmarks matching your filters
+# cd help
+ch() {
+cat << 'HELP'
+c  filter<tab> : list a subset of bookmarks matching your filters
+cs filter ...  :                        ""
+cs             : list all bookmarks
 ---------------+--------------------------------------------------
-cdb bookmark   : create a named bookmark for the current directory
+cb bookmark    : create a named bookmark for the current directory
 ---------------+--------------------------------------------------
-cdc            : import your personal ~/.cdmarks.skel file
-EOM
+ci             : import your personal ~/.cdmarks.skel file
+HELP
 }
 
-cds() {
-   if (($#)); then
-      out=$(command grep "$1" "$HOME"/.cdmarks)
-      for f in "${@:2}"; do
-         out=$(command grep "$f" <<< "$out")
-      done
-      echo "$out"
-   else column -t < "$HOME"/.cdmarks
+# <tab> completion for c
+complete -Fcd_complete c
+cd_complete() {
+   # Similar to cs()
+   local out=$(command grep -i "${COMP_WORDS[1]}" "$HOME"/.cdmarks)
+   for f in "${COMP_WORDS[@]:2}"
+   do out=$(command grep -i "$f" <<< "$out")
+   done
+   IFS=$'\n' read -r -d $'\0' -a dirlist < <(cut -d' ' -f2 <<< "$out")
+   if [[ $dirlist ]]
+   then IFS=$'\n' read -r -d $'\0' -a COMPREPLY < <(printf '%q\n' "${dirlist[@]}")
    fi
 }
 
-cdc() {
+# cds (cd in plural)
+cs() {
+   if (($#)); then
+      local out=$(command grep -i "$1" "$HOME"/.cdmarks)
+      for f in "${@:2}"
+      do out=$(command grep -i "$f" <<< "$out")
+      done
+      echo "$out"
+   else
+      column -t < "$HOME"/.cdmarks
+   fi
+}
+
+# cd bookmark
+cb() {
+   printf -v bookmark 'H\n/%s[^/]*$/s@\s*$@ %s@\nwq\n' "${PWD//\//\/}" "$1"
+   ed -s "$HOME"/.cdmarks <<< "$bookmark"
+}
+
+# cd import
+ci() {
    [[ -r $HOME/.cdmarks ]] && local reset='n' || local reset='y'
    read -p \
       "Are you sure you want to overwrite ~/.cdmarks with ~/.cdmarks.skel (y/N) " reset
    if [[ $reset == 'y' ]]
    then sed "s@\~@$HOME@" "$HOME"/.cdmarks.skel > "$HOME"/.cdmarks
    fi
-}
-
-cdb() {
-   printf -v bookmark 'H\n/%s[^/]*$/s@\s*$@ %s@\nwq\n' "${PWD//\//\/}" "$1"
-   ed -s "$HOME"/.cdmarks <<< "$bookmark"
 }
