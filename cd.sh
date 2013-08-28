@@ -80,6 +80,7 @@ cd_bookmarks() {
 
 # Use c as a shorter version of the main function
 alias c=cd_bookmarks
+alias cx=cd_bookmarks
 
 # Helper functions {{{1
 
@@ -106,10 +107,10 @@ update_weight() {
 # Add the current directory as a new entry
 new_entry() {
    if (($#)); then
+      # ed: a '1 directory mark' .
       printf -v new_dir 'H\na\n1 %s %s\n.\nwq\n' "$PWD" "$1"
       ed -s "$HOME"/.cdmarks <<< "$new_dir"
    else
-      # ed: a '1 directory' .
       printf -v new_dir 'H\na\n1 %s\n.\nwq\n' "$PWD"
       ed -s "$HOME"/.cdmarks <<< "$new_dir"
    fi
@@ -128,16 +129,18 @@ ci             : import your personal ~/.cdmarks.skel file
 HELP
 }
 
-# <tab> completion for c
-complete -Fcd_complete c
-cd_complete() {
+# <tab> completion
+_cd_complete() {
    # Similar to cs()
    local out=$(command grep -i "${COMP_WORDS[1]}" "$HOME"/.cdmarks)
    for f in "${COMP_WORDS[@]:2}"
    do out=$(command grep -i "$f" <<< "$out")
    done
    # Default directories
-   IFS=$'\n' read -r -d $'\0' -a defdirs < <(compgen -d "${COMP_WORDS[1]}")
+   if [[ ${FUNCNAME[1]} == 'cd_bcomplete' ]]
+   then defdirs=()
+   else IFS=$'\n' read -r -d $'\0' -a defdirs < <(compgen -d "${COMP_WORDS[1]}")
+   fi
    # Our bookmarked directories
    IFS=$'\n' read -r -d $'\0' -a dirlist < <(cut -d' ' -f2 <<< "$out")
    local dirs=("${defdirs[@]}" "${dirlist[@]}")
@@ -145,6 +148,10 @@ cd_complete() {
    then IFS=$'\n' read -r -d $'\0' -a COMPREPLY < <(printf '%q\n' "${dirs[@]}")
    fi
 }
+complete -Fcd_complete  c
+complete -Fcd_bcomplete cx
+cd_complete()  { _cd_complete "$@"; }
+cd_bcomplete() { _cd_complete "$@"; }
 
 # cds (cd in plural)
 cs() {
@@ -161,6 +168,7 @@ cs() {
 
 # cd bookmark
 # TODO: update weights if using this function after a builtin cd (check with fc)
+#       Add several named bookmarks at once
 cb() {
    if (($#)); then
       printf -v bookmark 'H\n/%s[^/]*$/s@\s*$@ %s@\nwq\n' "${PWD//\//\/}" "$1"
