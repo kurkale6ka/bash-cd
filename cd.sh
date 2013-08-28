@@ -109,19 +109,23 @@ update_weight() {
 
 cdh() {
 cat << 'EOM'
-cds          : list all bookmarks
-cds filter   : list a subset of bookmarks matching filter
--------------+--------------------------------------------------
-cdb bookmark : create a named bookmark for the current directory
--------------+--------------------------------------------------
-cdc          : import your personal ~/.cdmarks.skel file
+cds            : list all bookmarks
+cds filter ... : list a subset of bookmarks matching your filters
+---------------+--------------------------------------------------
+cdb bookmark   : create a named bookmark for the current directory
+---------------+--------------------------------------------------
+cdc            : import your personal ~/.cdmarks.skel file
 EOM
 }
 
 cds() {
-   if (($#))
-   then command   grep "$1" "$HOME"/.cdmarks | column -t
-   else         column -t < "$HOME"/.cdmarks
+   if (($#)); then
+      out=$(command grep "$1" "$HOME"/.cdmarks)
+      for f in "${@:2}"; do
+         out=$(command grep "$f" <<< "$out")
+      done
+      echo "$out"
+   else column -t < "$HOME"/.cdmarks
    fi
 }
 
