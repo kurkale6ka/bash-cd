@@ -47,7 +47,7 @@ cd() {
 
       fi
 
-   # 1 or + bookmarks: exclude 'cd wrong options' case {{{1
+   # 1 or + bookmarks (exclude 'cd wrong options' case) {{{1
    elif ((${#bookmarks[@]} > 0)); then
 
       truncate_marks
@@ -84,6 +84,8 @@ cd() {
 
    cat /tmp/cderror >&2; return 2
 }
+
+# Functions {{{1
 
 # Shrink file size to 100 lines when it reaches 150 lines
 truncate_marks() {
