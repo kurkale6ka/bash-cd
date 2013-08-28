@@ -84,7 +84,10 @@ cd_bookmarks() {
    cat /tmp/cderror >&2; return 2
 }
 
-# Functions {{{1
+# Use c as a shorter version of the main function
+alias c=cd_bookmarks
+
+# Helper functions {{{1
 
 # Shrink file size to 100 lines when it reaches 150 lines
 truncate_marks() {
@@ -93,10 +96,10 @@ truncate_marks() {
    fi
 }
 
+# Update weight for the current directory
 update_weight() {
    local line="$1" entry="$2"
 
-   # Increase weight of the directory
    # Path must not contain any @s !
    # ed: line s @ .* @ new_entry @
    printf -v update 'H\n%us@.*@%s@\nwq\n' "$line" "$entry"

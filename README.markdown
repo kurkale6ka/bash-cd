@@ -45,6 +45,9 @@ _Note 1_: `cs filter ...` will list your bookmarks (similar to `<tab>`
 completion) and `ci` can help you with migrating a personal `~/.cdmarks.skel` file
 
 _Note 2_: Never use ~ in `~/.cdmarks.skel` or if manually entering bookmarks in
-`~/.cdmarks` (use the value of **HOME** instead). Don't terminate paths with a `/`.
+`~/.cdmarks` (use the value of **HOME** instead). Don't terminate paths with a `/`
 
-_Note 3_: Get help with `ch`
+_Note 3_: If you want to use a different name than `c`, put `alias
+new_name=cd_bookmarks` after the `source` statement
+
+_Note 4_: Get help with `ch`
