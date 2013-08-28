@@ -123,7 +123,7 @@ HELP
 }
 
 # <tab> completion for c
-complete -Fcd_complete c
+complete -o default -Fcd_complete c
 cd_complete() {
    # Similar to cs()
    local out=$(command grep -i "${COMP_WORDS[1]}" "$HOME"/.cdmarks)
