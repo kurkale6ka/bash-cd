@@ -3,7 +3,8 @@ cd with weighted marks
 
 This is a script similar in functionality to **Bash**'s `pushd` and `popd`
 builtin commands. Every time you change directory it updates a bookmarks file
-either by adding a new entry or by increasing the weight of an existing one.
+either by adding a new entry or by increasing the weight of an existing one. The
+marks with highest scores are at the top of the file so they get matched first.
 
 The format is: _weight directory (optional bookmark)_  
 Example: `3 /usr/src/linux`
