@@ -6,7 +6,7 @@ builtin commands. Every time you change directory it updates a bookmarks file
 either by adding a new entry or by increasing the weight of an existing one. The
 marks with highest scores are at the top of the file so they get matched first.
 
-The format is: _weight directory (optional bookmark)_  
+The format is: _weight directory (optional bookmark)_
 Example: `3 /usr/src/linux`
 
 Once you've been to the above location you can return by simply typing:
@@ -14,7 +14,8 @@ Once you've been to the above location you can return by simply typing:
 `c li` (or any string part of the directory)
 
 **_Note_**: You could also `<tab>` complete your filter in order to list all
-possible locations: `c li<tab>`
+possible locations; `c li<tab>` will generate a list of bookmarked and default
+directories merged together. Use `cx li<tab>` if you want a bookmarked list only.
 
 Filtering further is also possible:
 
