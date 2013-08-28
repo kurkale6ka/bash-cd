@@ -15,7 +15,7 @@ cd_bookmarks() {
    fi
 
    # 0 or 1 directory: cd, cd options, cd directory {{{1
-   if ((${#bookmarks[@]} <= 1)) && builtin cd "$@" 2>/tmp/cderror; then
+   if ((${#bookmarks[@]} <= 1)) && cd "$@" 2>/tmp/cderror; then
 
       # I will use PWD instead of bookmarks[0]
       # This will ensure the following cases are dealt with correctly:
@@ -39,9 +39,7 @@ cd_bookmarks() {
          done < "$HOME"/.cdmarks
 
          # New entry for the current directory, it's the first time I cd here
-         # ed: a '1 directory' .
-         printf -v new_dir 'H\na\n1 %s\n.\nwq\n' "$PWD"
-         ed -s "$HOME"/.cdmarks <<< "$new_dir"
+         new_entry
          return 0
 
       fi
@@ -62,7 +60,7 @@ cd_bookmarks() {
          done
          if ((match)); then
             # cd options dir
-            if builtin cd "${@:1:((${#@}-${#bookmarks[@]}))}" "$dir" 2>/tmp/cderror; then
+            if cd "${@:1:((${#@}-${#bookmarks[@]}))}" "$dir" 2>/tmp/cderror; then
                if [[ $dir != $HOME && $dir != $current ]]; then
                   local new_weight="$weight"
                   local new_entry="$((++new_weight)) $dir $mark"
@@ -107,6 +105,18 @@ update_weight() {
 
    # Put highest score entries at the top
    sort -rn -o "$HOME"/.cdmarks "$HOME"/.cdmarks
+}
+
+# Add the current directory as a new entry
+new_entry() {
+   if (($#)); then
+      printf -v new_dir 'H\na\n1 %s %s\n.\nwq\n' "$PWD" "$1"
+      ed -s "$HOME"/.cdmarks <<< "$new_dir"
+   else
+      # ed: a '1 directory' .
+      printf -v new_dir 'H\na\n1 %s\n.\nwq\n' "$PWD"
+      ed -s "$HOME"/.cdmarks <<< "$new_dir"
+   fi
 }
 
 # cd help
@@ -154,9 +164,25 @@ cs() {
 }
 
 # cd bookmark
+# TODO: update weights if using this function after a builtin cd (check with fc)
 cb() {
-   printf -v bookmark 'H\n/%s[^/]*$/s@\s*$@ %s@\nwq\n' "${PWD//\//\/}" "$1"
-   ed -s "$HOME"/.cdmarks <<< "$bookmark"
+   if (($#)); then
+      printf -v bookmark 'H\n/%s[^/]*$/s@\s*$@ %s@\nwq\n' "${PWD//\//\/}" "$1"
+      if ! ed -s "$HOME"/.cdmarks <<< "$bookmark" 2>/dev/null
+      then new_entry "$1"
+      fi
+   else
+      # See TODO
+      # local line=0
+      # while read -r weight dir mark; do
+      #    ((line++))
+      #    if [[ $dir == $PWD ]]; then
+      #       update_weight "$line" "$((++weight)) $dir $mark"
+      #       return 0
+      #    fi
+      # done < "$HOME"/.cdmarks
+      new_entry
+   fi
 }
 
 # cd import
