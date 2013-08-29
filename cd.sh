@@ -97,8 +97,7 @@ update_weight() {
 
    # Path must not contain any @s !
    # ed: line s @ .* @ new_entry @
-   printf -v update 'H\n%us@.*@%s@\nwq\n' "$line" "$entry"
-   ed -s "$HOME"/.cdmarks <<< "$update"
+   ed -s "$HOME"/.cdmarks <<< $'H\n'"$line"$'s@.*@'"$entry"$'@\nwq\n'
 
    # Put highest score entries at the top
    sort -rn -o "$HOME"/.cdmarks "$HOME"/.cdmarks
@@ -106,7 +105,7 @@ update_weight() {
 
 # Add the current directory as a new entry
 new_entry() {
-   # ed: a '1 directory mark' .
+   # ed: a '1 directory marks' .
    if (($#))
    then ed -s "$HOME"/.cdmarks <<< $'H\na\n1 '"$PWD $@"$'\n.\nwq\n'
    else ed -s "$HOME"/.cdmarks <<< $'H\na\n1 '"$PWD"$'\n.\nwq\n'
@@ -172,9 +171,8 @@ cs() {
 # TODO: update weights if using this function after a builtin cd (check with fc)
 cb() {
    if (($#)); then
-      # TODO: Add several named bookmarks at once
-      printf -v bookmark 'H\n/%s[^/]*$/s@\s*$@ %s@\nwq\n' "${PWD//\//\/}" "$1"
-      if ! ed -s "$HOME"/.cdmarks <<< "$bookmark" 2>/dev/null
+      # ed: /PWD/ s / $ / bookmarks /
+      if ! ed -s "$HOME"/.cdmarks <<< $'H\n/'"${PWD//\//\/}"$'[^/]*$/s@\s*$@ '"$@"$'@\nwq\n' 2>/dev/null
       then new_entry "$@"
       fi
    else
