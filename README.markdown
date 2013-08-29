@@ -21,8 +21,9 @@ Filtering further is also possible:
 
 `c sr li` will ensure you don't end up in `/usr/share/lib` if it has a higher score!
 
-As an additional bonus you have the possibility to create a named bookmark (_no
-spaces allowed_) by typing `cb bookmark` while in the desired location
+As an additional bonus you have the possibility to create a named bookmark by
+typing `cb bookmark` while in the desired location. A named bookmark must NOT
+contain spaces.
 
 Example:
 ```
