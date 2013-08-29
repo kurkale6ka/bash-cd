@@ -95,8 +95,8 @@ truncate_marks() {
 # Update weight for the current directory
 update_weight() {
    # Sanitize input: s/[...]/.../g
-   local  line=$(command sed 's/[]\/()$*.^|[]/\\&/g' <<< "$1")
-   local entry=$(command sed 's/[\/&]/\\&/g'         <<< "$2")
+   local  line="$(command sed 's/[]\/()$*.^|[]/\\&/g' <<< "$1")"
+   local entry="$(command sed 's/[\/&]/\\&/g'         <<< "$2")"
 
    # ed: line s / .* / new_entry /
    ed -s "$HOME"/.cdmarks <<< $'H\n'"$line"$'s/.*/'"$entry"$'/\nwq\n'
@@ -131,9 +131,11 @@ HELP
 _cd_complete() {
    # Similar to cs()
    # Get a filtered set of bookmarks (c b1 b2 ...)
-   local out=$(command grep -i "${COMP_WORDS[1]}" "$HOME"/.cdmarks)
-   for f in "${COMP_WORDS[@]:2}"
-   do out=$(command grep -i "$f" <<< "$out")
+   local word="$(command sed 's/[]\/()$*.^|[]/\\&/g' <<< "${COMP_WORDS[1]}")"
+   local out="$(command grep -i "$word" "$HOME"/.cdmarks)"
+   for f in "${COMP_WORDS[@]:2}"; do
+      word="$(command sed 's/[]\/()$*.^|[]/\\&/g' <<< "$f")"
+      out="$(command grep -i "$word" <<< "$out")"
    done
 
    # Default directories
@@ -159,9 +161,11 @@ cd_bcomplete() { _cd_complete "$@"; }
 cs() {
    if (($#)); then
       # Get a filtered set of bookmarks (cs b1 b2 ...)
-      local out=$(command grep -i "$1" "$HOME"/.cdmarks)
-      for f in "${@:2}"
-      do out=$(command grep -i "$f" <<< "$out")
+      local word="$(command sed 's/[]\/()$*.^|[]/\\&/g' <<< "$1")"
+      local out="$(command grep -i "$word" "$HOME"/.cdmarks)"
+      for f in "${@:2}"; do
+         word="$(command sed 's/[]\/()$*.^|[]/\\&/g' <<< "$f")"
+         out="$(command grep -i "$word" <<< "$out")"
       done
       echo "$out"
    else
@@ -181,19 +185,22 @@ cs() {
 #    fi
 # done < "$HOME"/.cdmarks
 cb() {
+   # Sanitize input
+   local current="$(command sed 's/[]\/()$*.^|[]/\\&/g' <<< "$PWD")"
    if (($#)); then
-      # Sanitize input: s/[...]/.../g
-      local marks="${@//\\/\\}"
-      marks="${@//\//\/}"
-      marks="${@//&/\&}"
-      local current=$(command sed 's/[]\/()$*.^|[]/\\&/g' <<< "$PWD")
+      # The array is flattened here but it doesn't matter as we don't want
+      # bookmarks with spaces (ie: cb 'my bookmark' is forbidden)
+      local marks="$(command sed 's/[\/&]/\\&/g' <<< "$@")"
 
-      # ed: /PWD/ s / $ / bookmarks /
-      if ! ed -s "$HOME"/.cdmarks <<< $'H\n/'"$current"$'[^/]*$/s/\s*$/ '"${marks[@]}"$'/\nwq\n' 2>/dev/null
-      then new_entry "$@"
+      # ed: line s / $ / bookmarks /
+      # I can't use ed alone here as it doesn't support alternation (\|) in patterns
+      line="$(command grep -n "$current"'\([^/]\|\s*$\)' "$HOME"/.cdmarks | cut -d: -f1)"
+      if ((line))
+      then ed -s "$HOME"/.cdmarks <<< $'H\n'"$line"$'s/\s*$/ '"$marks"$'/\nwq\n'
+      else new_entry "$@"
       fi
    else
-      if ! command grep -i "$PWD" "$HOME"/.cdmarks
+      if ! command grep "$current" "$HOME"/.cdmarks
       then new_entry
       fi
    fi
@@ -205,7 +212,8 @@ ci() {
    read -p \
       'Are you sure you want to overwrite ~/.cdmarks with ~/.cdmarks.skel (y/N) ' reset
    if [[ $reset == 'y' ]]; then
-      local home=$(command sed 's/[\/&]/\\&/g' <<< "$HOME")
+      # Sanitize input
+      local home="$(command sed 's/[\/&]/\\&/g' <<< "$HOME")"
       sed "s/\~/$home/" "$HOME"/.cdmarks.skel > "$HOME"/.cdmarks
    fi
 }
