@@ -106,14 +106,10 @@ update_weight() {
 
 # Add the current directory as a new entry
 new_entry() {
-   if (($#)); then
-      # TODO: add several named bookmarks at once
-      # ed: a '1 directory mark' .
-      printf -v new_dir 'H\na\n1 %s %s\n.\nwq\n' "$PWD" "$1"
-      ed -s "$HOME"/.cdmarks <<< "$new_dir"
-   else
-      printf -v new_dir 'H\na\n1 %s\n.\nwq\n' "$PWD"
-      ed -s "$HOME"/.cdmarks <<< "$new_dir"
+   # ed: a '1 directory mark' .
+   if (($#))
+   then ed -s "$HOME"/.cdmarks <<< $'H\na\n1 '"$PWD $@"$'\n.\nwq\n'
+   else ed -s "$HOME"/.cdmarks <<< $'H\na\n1 '"$PWD"$'\n.\nwq\n'
    fi
 }
 
@@ -134,10 +130,12 @@ HELP
 # <tab> completion
 _cd_complete() {
    # Similar to cs()
+   # Get a filtered set of bookmarks (c b1 b2 ...)
    local out=$(command grep -i "${COMP_WORDS[1]}" "$HOME"/.cdmarks)
    for f in "${COMP_WORDS[@]:2}"
    do out=$(command grep -i "$f" <<< "$out")
    done
+
    # Default directories
    if [[ ${FUNCNAME[1]} == 'cd_bcomplete' ]]
    then local defdirs=()
@@ -145,6 +143,7 @@ _cd_complete() {
    fi
    # Our bookmarked directories (color?)
    IFS=$'\n' read -r -d $'\0' -a dirlist < <(cut -d' ' -f2 <<< "$out")
+
    local dirs=("${defdirs[@]}" "${dirlist[@]}")
    if [[ $dirs ]]
    then IFS=$'\n' read -r -d $'\0' -a COMPREPLY < <(printf '%q\n' "${dirs[@]}")
@@ -158,6 +157,7 @@ cd_bcomplete() { _cd_complete "$@"; }
 # cds (cd in plural)
 cs() {
    if (($#)); then
+      # Get a filtered set of bookmarks (cs b1 b2 ...)
       local out=$(command grep -i "$1" "$HOME"/.cdmarks)
       for f in "${@:2}"
       do out=$(command grep -i "$f" <<< "$out")
@@ -175,7 +175,7 @@ cb() {
       # TODO: Add several named bookmarks at once
       printf -v bookmark 'H\n/%s[^/]*$/s@\s*$@ %s@\nwq\n' "${PWD//\//\/}" "$1"
       if ! ed -s "$HOME"/.cdmarks <<< "$bookmark" 2>/dev/null
-      then new_entry "$1"
+      then new_entry "$@"
       fi
    else
       # See TODO
