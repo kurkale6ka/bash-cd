@@ -13,7 +13,7 @@ cd_bookmarks() {
    then [[ $PWD == ${bookmarks[0]%/} ]] && return 0
    fi
 
-   local current="$PWD"
+   local old_pwd="$PWD"
 
    # 0 or 1 directory: cd, cd options, cd directory {{{1
    if ((${#bookmarks[@]} <= 1)) && cd "$@" 2>/tmp/cderror; then
@@ -23,7 +23,7 @@ cd_bookmarks() {
       # cd -
       # directory typo (cdspell: /var/loc -> log)
       # cd /etc/X11/ creating a different entry than cd /etc/X11
-      if [[ $PWD != $HOME && $PWD != $current ]]; then
+      if [[ $PWD != $HOME && $PWD != $old_pwd ]]; then
 
          truncate_marks
 
@@ -60,7 +60,7 @@ cd_bookmarks() {
          if ((match)); then
             # cd options dir
             if cd "${@:1:((${#@}-${#bookmarks[@]}))}" "$dir" 2>/tmp/cderror; then
-               if [[ $dir != $current ]]
+               if [[ $dir != $old_pwd ]]
                then update_weight "$line" "$((++weight)) $dir $marks"
                fi
                return 0
