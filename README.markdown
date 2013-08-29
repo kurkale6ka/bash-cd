@@ -21,8 +21,8 @@ Filtering further is also possible:
 
 `c sr li` will ensure you don't end up in `/usr/share/lib` if it has a higher score!
 
-As an additional bonus you have the possibility to create a named bookmark by
-typing `cb bookmark` while in the desired location
+As an additional bonus you have the possibility to create a named bookmark (_no
+spaces allowed) by typing `cb bookmark` while in the desired location
 
 Example:
 ```
@@ -42,13 +42,13 @@ Setup
 
 You are ready!
 
-_Note 1_: `cs filter ...` will list your bookmarks (similar to `<tab>`
+**_Note 1_**: `cs filter ...` will list your bookmarks (similar to `<tab>`
 completion) and `ci` can help you with migrating a personal `~/.cdmarks.skel` file
 
-_Note 2_: Never use ~ in `~/.cdmarks.skel` or if manually entering bookmarks in
-`~/.cdmarks` (use the value of **HOME** instead). Don't terminate paths with a `/`
+**_Note 2_**: Never use ~ in `~/.cdmarks.skel` or if manually entering bookmarks in
+`~/.cdmarks` (use the value of `HOME` instead). Don't terminate paths with a `/`
 
-_Note 3_: If you want to use a different name than `c`, put `alias
+**_Note 3_**: If you want to use a different name than `c`, put `alias
 new_name=cd_bookmarks` after the `source` statement
 
-_Note 4_: Get help with `ch`
+**_Note 4_**: Get help with `ch`
