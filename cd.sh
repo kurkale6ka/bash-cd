@@ -1,7 +1,6 @@
 #! /usr/bin/env bash
 
 cd_bookmarks() {
-   local current="$PWD"
 
    # Get bookmarks/directory from: cd options bookmark 1...n {{{1
    bookmarks=()
@@ -11,8 +10,10 @@ cd_bookmarks() {
 
    # A single bookmark => check that it doesnt match the current folder
    if ((${#bookmarks[@]} == 1))
-   then [[ $current == ${bookmarks[0]%/} ]] && return 0
+   then [[ $PWD == ${bookmarks[0]%/} ]] && return 0
    fi
+
+   local current="$PWD"
 
    # 0 or 1 directory: cd, cd options, cd directory {{{1
    if ((${#bookmarks[@]} <= 1)) && cd "$@" 2>/tmp/cderror; then
