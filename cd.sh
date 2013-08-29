@@ -137,6 +137,7 @@ _cd_complete() {
    done
 
    # Default directories
+   # Don't mix default with custom completion (use custom only)
    if [[ ${FUNCNAME[1]} == 'cd_bcomplete' ]]
    then local defdirs=()
    else IFS=$'\n' read -r -d $'\0' -a defdirs < <(compgen -d "${COMP_WORDS[1]}")
@@ -154,7 +155,7 @@ complete -Fcd_bcomplete cx
 cd_complete()  { _cd_complete "$@"; }
 cd_bcomplete() { _cd_complete "$@"; }
 
-# cds (cd in plural)
+# cds (mnemo: cd in plural)
 cs() {
    if (($#)); then
       # Get a filtered set of bookmarks (cs b1 b2 ...)
@@ -170,6 +171,15 @@ cs() {
 
 # cd bookmark
 # TODO: update weights if using this function after a builtin cd (check with fc)
+#       and the current directory is not a new entry
+# local line=0
+# while read -r weight dir marks; do
+#    ((line++))
+#    if [[ $dir == $PWD ]]; then
+#       update_weight "$line" "$((++weight)) $dir $marks"
+#       return 0
+#    fi
+# done < "$HOME"/.cdmarks
 cb() {
    if (($#)); then
       # ed: /PWD/ s / $ / bookmarks /
@@ -177,16 +187,9 @@ cb() {
       then new_entry "$@"
       fi
    else
-      # See TODO
-      # local line=0
-      # while read -r weight dir marks; do
-      #    ((line++))
-      #    if [[ $dir == $PWD ]]; then
-      #       update_weight "$line" "$((++weight)) $dir $marks"
-      #       return 0
-      #    fi
-      # done < "$HOME"/.cdmarks
-      new_entry
+      if ! command grep -i "$PWD" "$HOME"/.cdmarks
+      then new_entry
+      fi
    fi
 }
 
@@ -194,7 +197,7 @@ cb() {
 ci() {
    [[ -r $HOME/.cdmarks ]] && local reset='n' || local reset='y'
    read -p \
-      "Are you sure you want to overwrite ~/.cdmarks with ~/.cdmarks.skel (y/N) " reset
+      'Are you sure you want to overwrite ~/.cdmarks with ~/.cdmarks.skel (y/N) ' reset
    if [[ $reset == 'y' ]]
    then sed "s@\~@$HOME@" "$HOME"/.cdmarks.skel > "$HOME"/.cdmarks
    fi
