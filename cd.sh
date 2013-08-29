@@ -106,10 +106,9 @@ update_weight() {
 
 # Add the current directory as a new entry
 new_entry() {
-   # ed: a '1 directory marks' .
    if (($#))
-   then ed -s "$HOME"/.cdmarks <<< $'H\na\n1 '"$PWD $@"$'\n.\nwq\n'
-   else ed -s "$HOME"/.cdmarks <<< $'H\na\n1 '"$PWD"$'\n.\nwq\n'
+   then echo "1 $PWD $@" >> "$HOME"/.cdmarks
+   else echo "1 $PWD"    >> "$HOME"/.cdmarks
    fi
 }
 
