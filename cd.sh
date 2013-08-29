@@ -94,11 +94,12 @@ truncate_marks() {
 
 # Update weight for the current directory
 update_weight() {
-   local line="$1" entry="$2"
+   # Sanitize input: s/[...]/.../g
+   local  line=$(command sed 's/[]\/()$*.^|[]/\\&/g' <<< "$1")
+   local entry=$(command sed 's/[\/&]/\\&/g'         <<< "$2")
 
-   # Path must not contain any @s !
-   # ed: line s @ .* @ new_entry @
-   ed -s "$HOME"/.cdmarks <<< $'H\n'"$line"$'s@.*@'"$entry"$'@\nwq\n'
+   # ed: line s / .* / new_entry /
+   ed -s "$HOME"/.cdmarks <<< $'H\n'"$line"$'s/.*/'"$entry"$'/\nwq\n'
 
    # Put highest score entries at the top
    sort -rn -o "$HOME"/.cdmarks "$HOME"/.cdmarks
@@ -182,8 +183,14 @@ cs() {
 # done < "$HOME"/.cdmarks
 cb() {
    if (($#)); then
+      # Sanitize input: s/[...]/.../g
+      local marks="${@//\\/\\}"
+      marks="${@//\//\/}"
+      marks="${@//&/\&}"
+      local current=$(command sed 's/[]\/()$*.^|[]/\\&/g' <<< "$PWD")
+
       # ed: /PWD/ s / $ / bookmarks /
-      if ! ed -s "$HOME"/.cdmarks <<< $'H\n/'"${PWD//\//\/}"$'[^/]*$/s@\s*$@ '"$@"$'@\nwq\n' 2>/dev/null
+      if ! ed -s "$HOME"/.cdmarks <<< $'H\n/'"$current"$'[^/]*$/s/\s*$/ '"${marks[@]}"$'/\nwq\n' 2>/dev/null
       then new_entry "$@"
       fi
    else
@@ -198,7 +205,8 @@ ci() {
    [[ -r $HOME/.cdmarks ]] && local reset='n' || local reset='y'
    read -p \
       'Are you sure you want to overwrite ~/.cdmarks with ~/.cdmarks.skel (y/N) ' reset
-   if [[ $reset == 'y' ]]
-   then sed "s@\~@$HOME@" "$HOME"/.cdmarks.skel > "$HOME"/.cdmarks
+   if [[ $reset == 'y' ]]; then
+      local home=$(command sed 's/[\/&]/\\&/g' <<< "$HOME")
+      sed "s/\~/$home/" "$HOME"/.cdmarks.skel > "$HOME"/.cdmarks
    fi
 }
