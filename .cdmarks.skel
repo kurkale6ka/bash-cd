@@ -1,15 +1,22 @@
-1 ~/vimfiles/bundle/pairs
-1 ~/vimfiles/bundle plugin
-1 ~/vimfiles vf
-1 ~/test
-1 ~/help hf
-1 ~/bashfiles/scripts/cd
-1 ~/bashfiles bf
-1 ~/Pictures img
-1 ~/Music audio
-1 ~/Movies films videos
-1 ~/Downloads
-1 ~/Documents
-1 /var/log
+1 /etc/cron.d
+1 /etc/cron.daily
+1 /etc/httpd/vhosts.d
+1 /etc/init.d
+1 /etc/logrotate.d
+1 /usr/local
+1 /usr/share
 1 /usr/src/linux
-1 /media/0007-6BCA usb
+1 /var/log
+1 /var/log/httpd
+1 ~/Documents
+1 ~/Downloads
+1 ~/Movies films videos
+1 ~/Music audio
+1 ~/Pictures img
+1 ~/bashfiles bf
+1 ~/bashfiles/scripts/cd
+1 ~/help hf
+1 ~/test
+1 ~/vimfiles vf
+1 ~/vimfiles/bundle plugin
+1 ~/vimfiles/bundle/pairs
