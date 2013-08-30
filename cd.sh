@@ -55,7 +55,7 @@ cd_bookmarks() {
          # Check that bookmark x AND bookmark y AND ... match in this line
          local match=1
          for m in "${bookmarks[@]}"
-         do [[ "$dir $marks" != *$m* ]] && match=0
+         do [[ "$dir $marks" != *"$m"* ]] && match=0
          done
          if ((match)); then
             # cd options dir
@@ -95,7 +95,7 @@ truncate_marks() {
 # Update weight for the current directory
 update_weight() {
    # Sanitize input: s/[...]/.../g
-   local  line="$(command sed 's/[]\/()$*.^|[]/\\&/g' <<< "$1")"
+   local  line="$(command sed 's/[]\/$*.^|[]/\\&/g' <<< "$1")"
    local entry="$(command sed 's/[\/&]/\\&/g'         <<< "$2")"
 
    # ed: line s / .* / new_entry /
@@ -131,10 +131,10 @@ HELP
 _cd_complete() {
    # Similar to cs()
    # Get a filtered set of bookmarks (c b1 b2 ...)
-   local word="$(command sed 's/[]\/()$*.^|[]/\\&/g' <<< "${COMP_WORDS[1]}")"
+   local word="$(command sed 's/[]\/$*.^|[]/\\&/g' <<< "${COMP_WORDS[1]}")"
    local out="$(command grep -i "$word" "$HOME"/.cdmarks)"
    for f in "${COMP_WORDS[@]:2}"; do
-      word="$(command sed 's/[]\/()$*.^|[]/\\&/g' <<< "$f")"
+      word="$(command sed 's/[]\/$*.^|[]/\\&/g' <<< "$f")"
       out="$(command grep -i "$word" <<< "$out")"
    done
 
@@ -161,10 +161,10 @@ cd_bcomplete() { _cd_complete "$@"; }
 cs() {
    if (($#)); then
       # Get a filtered set of bookmarks (cs b1 b2 ...)
-      local word="$(command sed 's/[]\/()$*.^|[]/\\&/g' <<< "$1")"
+      local word="$(command sed 's/[]\/$*.^|[]/\\&/g' <<< "$1")"
       local out="$(command grep -i "$word" "$HOME"/.cdmarks)"
       for f in "${@:2}"; do
-         word="$(command sed 's/[]\/()$*.^|[]/\\&/g' <<< "$f")"
+         word="$(command sed 's/[]\/$*.^|[]/\\&/g' <<< "$f")"
          out="$(command grep -i "$word" <<< "$out")"
       done
       echo "$out"
@@ -186,7 +186,7 @@ cs() {
 # done < "$HOME"/.cdmarks
 cb() {
    # Sanitize input
-   local current="$(command sed 's/[]\/()$*.^|[]/\\&/g' <<< "$PWD")"
+   local current="$(command sed 's/[]\/$*.^|[]/\\&/g' <<< "$PWD")"
    if (($#)); then
       # The array is flattened here but it doesn't matter as we don't want
       # bookmarks with spaces (ie: cb 'my bookmark' is forbidden)
