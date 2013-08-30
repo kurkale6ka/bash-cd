@@ -96,7 +96,7 @@ truncate_marks() {
 update_weight() {
    # Sanitize input: s/[...]/.../g
    local  line="$(command sed 's/[]\/$*.^|[]/\\&/g' <<< "$1")"
-   local entry="$(command sed 's/[\/&]/\\&/g'         <<< "$2")"
+   local entry="$(command sed 's/[\/&]/\\&/g'       <<< "$2")"
 
    # ed: line s / .* / new_entry /
    ed -s "$HOME"/.cdmarks <<< $'H\n'"$line"$'s/.*/'"$entry"$'/\nwq\n'
