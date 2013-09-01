@@ -208,9 +208,14 @@ cb() {
 
 # cd import
 ci() {
-   [[ -r $HOME/.cdmarks ]] && local reset='n' || local reset='y'
-   read -p \
-      'Are you sure you want to overwrite ~/.cdmarks with ~/.cdmarks.skel (y/N) ' reset
+   if [[ -r $HOME/.cdmarks ]]; then
+      read -p \
+         'Are you sure you want to overwrite ~/.cdmarks with ~/.cdmarks.skel (y/N) ' \
+         reset
+   else
+      local reset=y
+      echo "Created $HOME/.cdmarks"
+   fi
    if [[ $reset == 'y' ]]; then
       # Sanitize input
       local home="$(command sed 's/[\/&]/\\&/g' <<< "$HOME")"
