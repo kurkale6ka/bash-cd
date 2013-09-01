@@ -214,7 +214,7 @@ ci() {
          reset
    else
       local reset=y
-      echo "Created $HOME/.cdmarks"
+      echo "Creating $HOME/.cdmarks..."
    fi
    if [[ $reset == 'y' ]]; then
       # Sanitize input
