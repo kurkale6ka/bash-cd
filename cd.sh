@@ -142,7 +142,7 @@ _cd_complete() {
    # Don't mix default with custom completion (use custom only)
    if [[ ${FUNCNAME[1]} == 'cd_bcomplete' ]]
    then local defdirs=()
-   else IFS=$'\n' read -r -d $'\0' -a defdirs < <(compgen -d "${COMP_WORDS[1]}")
+   else IFS=$'\n' read -r -d $'\0' -a defdirs < <(compgen -S/ -d "${COMP_WORDS[1]}")
    fi
    # Our bookmarked directories (color?)
    IFS=$'\n' read -r -d $'\0' -a dirlist < <(cut -d' ' -f2 <<< "$out")
@@ -152,8 +152,8 @@ _cd_complete() {
    then IFS=$'\n' read -r -d $'\0' -a COMPREPLY < <(printf '%q\n' "${dirs[@]}")
    fi
 }
-complete -Fcd_complete  c
-complete -Fcd_bcomplete cx
+complete -o nospace -Fcd_complete  c
+complete -o nospace -Fcd_bcomplete cx
 cd_complete()  { _cd_complete "$@"; }
 cd_bcomplete() { _cd_complete "$@"; }
 
