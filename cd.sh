@@ -16,7 +16,7 @@ cd_bookmarks() {
    local old_pwd="$PWD"
 
    # 0 or 1 directory: cd, cd options, cd directory {{{1
-   if ((${#bookmarks[@]} <= 1)) && cd "$@" 2>/tmp/cderror; then
+   if ((${#bookmarks[@]} <= 1)) && cd "$@" 2>/tmp/.cdmarks_"$USER".err; then
 
       # I will use PWD instead of bookmarks[0]
       # This will ensure the following cases are dealt with correctly:
@@ -59,7 +59,7 @@ cd_bookmarks() {
          done
          if ((match)); then
             # cd options dir
-            if cd "${@:1:((${#@}-${#bookmarks[@]}))}" "$dir" 2>/tmp/cderror; then
+            if cd "${@:1:((${#@}-${#bookmarks[@]}))}" "$dir" 2>/tmp/.cdmarks_"$USER".err; then
                if [[ $dir != $old_pwd ]]
                then update_weight "$line" "$((++weight)) $dir $marks"
                fi
@@ -76,7 +76,7 @@ cd_bookmarks() {
 
    fi
 
-   cat /tmp/cderror >&2; return 2
+   cat /tmp/.cdmarks_"$USER".err >&2; return 2
 }
 
 # Use c as a shorter version of the main function
