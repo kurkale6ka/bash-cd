@@ -13,10 +13,12 @@
 1 ~/Movies films videos
 1 ~/Music audio
 1 ~/Pictures img
-1 ~/bashfiles bf
-1 ~/bashfiles/scripts/cd
-1 ~/help hf
+1 ~/bash bf
+1 ~/bash/scripts/cd
+1 ~/config
+1 ~/help
+1 ~/scripts
 1 ~/test
-1 ~/vimfiles vf
-1 ~/vimfiles/bundle plugin
-1 ~/vimfiles/bundle/pairs
+1 ~/vim
+1 ~/vim/bundle plugin
+1 ~/vim/bundle/pairs
