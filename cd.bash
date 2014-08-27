@@ -87,7 +87,7 @@ alias cx=cd_bookmarks
 
 # Shrink file size to 100 lines when it reaches 150 lines
 truncate_marks() {
-   if (( $(wc -l $HOME/.cdmarks | cut -d' ' -f1) > 150 ))
+   if (( $(wc -l $HOME/.cdmarks | grep -o '[1-9]\+') > 150 ))
    then ed -s "$HOME"/.cdmarks <<< $'H\n101,$d\nwq\n'
    fi
 }
