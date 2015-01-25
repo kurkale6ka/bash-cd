@@ -88,7 +88,7 @@ alias cx=cd_bookmarks
 # Shrink file size to 100 lines when it reaches 150 lines
 truncate_marks() {
    if (( $(wc -l $HOME/.cdmarks | grep -o '[0-9]\+') > 150 ))
-   then ed -s "$HOME"/.cdmarks <<< $'H\n101,$d\nwq\n'
+   then \ed -s "$HOME"/.cdmarks <<< $'H\n101,$d\nwq\n'
    fi
 }
 
@@ -99,7 +99,7 @@ update_weight() {
    local entry="$(command sed 's/[\/&]/\\&/g'       <<< "$2")"
 
    # ed: line s / .* / new_entry /
-   ed -s "$HOME"/.cdmarks <<< $'H\n'"$line"$'s/.*/'"$entry"$'/\nwq\n'
+   \ed -s "$HOME"/.cdmarks <<< $'H\n'"$line"$'s/.*/'"$entry"$'/\nwq\n'
 
    # Put highest score entries at the top
    sort -rn -o "$HOME"/.cdmarks "$HOME"/.cdmarks
@@ -196,7 +196,7 @@ cb() {
       # I can't use ed alone here as it doesn't support alternation (\|) in patterns
       line="$(command grep -n "$current"'\([^/]\|\s*$\)' "$HOME"/.cdmarks | cut -d: -f1)"
       if ((line))
-      then ed -s "$HOME"/.cdmarks <<< $'H\n'"$line"$'s/\s*$/ '"$marks"$'/\nwq\n'
+      then \ed -s "$HOME"/.cdmarks <<< $'H\n'"$line"$'s/\s*$/ '"$marks"$'/\nwq\n'
       else new_entry "$@"
       fi
    else
